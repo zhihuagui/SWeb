@@ -27,9 +27,13 @@ export class SMouseEvent extends SEventBase {
 }
 
 export class SKeyboardEvent extends SEventBase {
-
+    constructor(public value: string) {
+        super(SEventType.Keyboard);
+    }
 }
 
 export class AppInternalEvent extends SEventBase {
-
+    constructor(public type1: string) {
+        super(SEventType.Network);
+    }
 }

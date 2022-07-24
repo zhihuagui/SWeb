@@ -1,6 +1,8 @@
 import { SEventType } from "../message/base";
 import { AppInternalEvent, SKeyboardEvent, SMouseEvent, SMouseEventType } from "../message/event";
+import { ArrayBufferMessage } from "../message/message";
 
+declare const self: Worker;
 
 class App {
     constructor() {
@@ -38,6 +40,11 @@ class App {
             } else {
                 if (msg instanceof SMouseEvent) {
                     console.log(`process message ${msg.eventId}, mouse type: ${SMouseEventType[msg.mouseType]}, x: ${msg.x}, y: ${msg.y}`);
+                    if (msg.mouseType === SMouseEventType.MouseMove) {
+                        const bfmsg = new ArrayBufferMessage(msg.x, msg.y);
+                        bfmsg.setBufferValue(msg.eventId % 256);
+                        self.postMessage(bfmsg.buffer, [bfmsg.buffer]);
+                    }
                 }
             }
         }
@@ -56,10 +63,12 @@ class App {
 
     public receiveMessage(msg: SMouseEvent | SKeyboardEvent) {
         this._messageQueue.push(msg);
+        // let ss = this._messageQueue.shift();
+        // this._messageQueue.push(new AppInternalEvent('Network'));
         this.triggerMsgLoop();
     }
 
-    private _messageQueue: (SMouseEvent | SKeyboardEvent)[] = [];
+    private _messageQueue: (SMouseEvent | SKeyboardEvent | AppInternalEvent)[] = [];
     private _msgTrigging = false;
     private _tickWorker: Worker;
 }
