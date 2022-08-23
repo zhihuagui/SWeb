@@ -4,7 +4,7 @@ import { ArrayBufferMessage } from "../message/message";
 
 declare const self: Worker;
 
-class App {
+class AppWrapper {
     constructor() {
         /**
          * worker中有自己的事件循环，由于settimeout反应时间比较慢，使用worker直接传递，可更快速的相应
@@ -39,7 +39,7 @@ class App {
                 }
             } else {
                 if (msg instanceof SMouseEvent) {
-                    console.log(`process message ${msg.eventId}, mouse type: ${SMouseEventType[msg.mouseType]}, x: ${msg.x}, y: ${msg.y}`);
+                    // console.log(`process message ${msg.eventId}, mouse type: ${SMouseEventType[msg.mouseType]}, x: ${msg.x}, y: ${msg.y}`);
                     if (msg.mouseType === SMouseEventType.MouseMove) {
                         const bfmsg = new ArrayBufferMessage(msg.x, msg.y);
                         bfmsg.setBufferValue(msg.eventId % 256);
@@ -73,7 +73,7 @@ class App {
     private _tickWorker: Worker;
 }
 
-const app = new App();
+const app = new AppWrapper();
 
 global.onmessage = (event) => {
     const data = event.data;
